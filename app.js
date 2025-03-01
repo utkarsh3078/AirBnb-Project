@@ -3,6 +3,7 @@ const app = express()
 const mongoose = require('mongoose');
 const Listing = require("./models/listing.js");
 const path = require("path");       //For working of veiws folder
+const methodOverride = require("method-override");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 main()
@@ -20,6 +21,7 @@ async function main(){
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({extended:true}));   //For parsing the data
+app.use(methodOverride("_method"));
 
 app.get("/", (req,res)=>{
    res.send("Hello World");
@@ -48,10 +50,21 @@ app.post("/Listings", async(req,res)=>{
    const newListing = new Listing(req.body.listing);
    await newListing.save();
    res.redirect("/Listings");
+});
+
+//Edit Route
+app.get("/Listings/:id/edit", async(req,res)=>{
+   const {id} = req.params; 
+   const listing = await Listing.findById(id);
+   res.render("./Listing/edit.ejs", {listing});
 })
 
-
-
+//Update Route
+app.post("/Listings/:id", async(req,res)=>{
+   const {id} = req.params;
+   await Listing.findByIdAndUpdate(id, {...req.body.listing});
+   res.redirect(`/Listings/${id}`);
+})
 
 // app.get("/testListing", async (req,res)=>{
 //  let sampleTesting = new Listing({

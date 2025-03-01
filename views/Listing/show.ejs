@@ -13,6 +13,8 @@
         <li>&#8377; <%= listing.price.toLocaleString("en-IN") %></li>
         <li><%=listing.location%></li>
         <li><%=listing.country%></li>
+        <br>
+        <a href="/Listings/<%= listing._id%>/edit">Edit this listing</a>
     </ul>
 </body>
 </html>
