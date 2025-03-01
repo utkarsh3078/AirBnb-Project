@@ -60,10 +60,17 @@ app.get("/Listings/:id/edit", async(req,res)=>{
 })
 
 //Update Route
-app.post("/Listings/:id", async(req,res)=>{
+app.put("/Listings/:id", async(req,res)=>{            //Put is used for updating the data and we used method override here also so post ke jage put aayega
    const {id} = req.params;
    await Listing.findByIdAndUpdate(id, {...req.body.listing});
    res.redirect(`/Listings/${id}`);
+});
+
+//Delete Route
+app.delete("/Listings/:id", async(req,res)=>{
+   const{id} = req.params;
+   await Listing.findByIdAndDelete(id);
+   res.redirect("/Listings");
 })
 
 // app.get("/testListing", async (req,res)=>{

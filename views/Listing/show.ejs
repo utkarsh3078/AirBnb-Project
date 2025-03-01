@@ -15,6 +15,10 @@
         <li><%=listing.country%></li>
         <br>
         <a href="/Listings/<%= listing._id%>/edit">Edit this listing</a>
+        <br><br>
+        <form method="POST" action="/Listings/<%= listing._id%>?_method=DELETE">  <!--Method-Override is used here -->
+            <button>Delete this listing</button>
+        </form>
     </ul>
 </body>
 </html>
