@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust</title>
-</head>
+<% layout("Layouts/boilerplate") %>  <!--This line is used to include the boilerplate layout file in this file -->
 <body>
     <h2>Edit this Listing</h2>
     <form method="POST" action="/Listings/<%=listing._id%>?_method=PUT"> <!-- we are basically converting post request to put request by method-override -->
@@ -23,4 +17,3 @@
         <button>Edit</button>
     </form>
 </body>
-</html>
