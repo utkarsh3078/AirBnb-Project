@@ -9,8 +9,8 @@ const ListingSchema = new Schema({
     description: String,
     image:{
         type: String,
-        default: "https://unsplash.com/photos/a-large-white-building-with-a-tree-in-front-of-it-2YZBMkZPgRE",
-        set: (v) => v==="" ? "https://unsplash.com/photos/a-large-white-building-with-a-tree-in-front-of-it-2YZBMkZPgRE": v,
+        default: "https://images.unsplash.com/photo-1740504713072-2b634befcf6a?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        set: (v) => v==="" ? "https://images.unsplash.com/photo-1740504713072-2b634befcf6a?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D": v,
     },
     price: Number,
     location: String,
