@@ -33,6 +33,17 @@ app.get("/", (req,res)=>{
    res.send("Hello World");
 })
 
+const validateListing = (req,res,next)=>{                    //Middleware for validating the data
+   let {error}= listingSchema.validate(req.body);
+
+   if(error){
+      let errMsg = error.details.map(el=> el.message).join(",");
+      throw new ExpressError(400, result.error);
+   } else{
+      next();
+   }
+}
+
  //Index Route
 app.get("/Listings", async(req,res)=>{
    const allListing = await Listing.find({})
@@ -52,12 +63,7 @@ app.get("/Listings/:id", wrapAsync( async(req,res)=>{
 }))
 
 //Create route
-app.post("/Listings", wrapAsync(async(req,res,next)=>{
-   let result = listingSchema.validate(req.body);
-   console.log(result);
-   if(result.error){
-      throw new ExpressError(400, result.error);
-   } 
+app.post("/Listings",validateListing, wrapAsync(async(req,res,next)=>{
    const newListing = new Listing(req.body.listing);
    await newListing.save();
    res.redirect("/Listings");
@@ -71,7 +77,7 @@ app.get("/Listings/:id/edit",wrapAsync( async(req,res)=>{
 }));
 
 //Update Route
-app.put("/Listings/:id", wrapAsync(async(req,res)=>{            //Put is used for updating the data and we used method override here also so post ke jage put aayega
+app.put("/Listings/:id",validateListing, wrapAsync(async(req,res)=>{            //Put is used for updating the data and we used method override here also so post ke jage put aayega
    const {id} = req.params;
    if(!req.body.listing){ 
       throw new ExpressError(400, "Send valid data");
