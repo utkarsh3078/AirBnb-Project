@@ -53,19 +53,12 @@ app.get("/Listings/:id", wrapAsync( async(req,res)=>{
 
 //Create route
 app.post("/Listings", wrapAsync(async(req,res,next)=>{
-   if(!req.body.listing){ 
-      throw new ExpressError(400, "Send valid data");
-   }
+   let result = listingSchema.validate(req.body);
+   console.log(result);
+   if(result.error){
+      throw new ExpressError(400, result.error);
+   } 
    const newListing = new Listing(req.body.listing);
-   if(!newListing.title){
-      throw new ExpressError(400, "Title is missing");
-   }
-   if(!newListing.description){
-      throw new ExpressError(400, "Description is missing");
-   }
-   if(!newListing.location){
-      throw new ExpressError(400, "location is missing");
-   }
    await newListing.save();
    res.redirect("/Listings");
 }));
