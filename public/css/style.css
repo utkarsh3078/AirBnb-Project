@@ -97,4 +97,9 @@ body{
     height: 30vh;
 }
 
+.btns{
+    display: flex;
+    align-items: center;
+}
+
 
