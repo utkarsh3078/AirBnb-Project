@@ -7,7 +7,7 @@ const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const {listingSchema} = require("./Schema.js");
+const {listingSchema , reviewSchema} = require("./Schema.js");
 const Review = require("./models/review.js");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
@@ -39,7 +39,18 @@ const validateListing = (req,res,next)=>{                    //Middleware for va
 
    if(error){
       let errMsg = error.details.map(el=> el.message).join(",");
-      throw new ExpressError(400, result.error);
+      throw new ExpressError(400, errMsg);
+   } else{
+      next();
+   }
+}
+
+const validateReview = (req,res,next)=>{                    //Middleware for validating the data
+   let {error}= reviewSchema.validate(req.body);
+
+   if(error){
+      let errMsg = error.details.map(el=> el.message).join(",");
+      throw new ExpressError(400, errMsg);
    } else{
       next();
    }
@@ -59,7 +70,7 @@ app.get("/Listings/new", (req,res)=>{
 //Show route 
 app.get("/Listings/:id", wrapAsync( async(req,res)=>{
    const {id} = req.params;
-   const listing = await Listing.findById(id);
+   const listing = await Listing.findById(id).populate("review");  //Populate is used to get the data of review in listing
    res.render("./Listing/show.ejs", {listing});
 }))
 
@@ -95,19 +106,17 @@ app.delete("/Listings/:id", wrapAsync(async(req,res)=>{
 }));
 
 //Review Route
-app.post("/Listings/:id/reviews", async(req,res)=>{
+app.post("/Listings/:id/reviews",validateReview , wrapAsync(async(req,res)=>{
    let listing = await Listing.findById(req.params.id);
    const newReview = new Review(req.body.review);
 
    listing.review.push(newReview);
 
    await newReview.save();
-   await listing.save();
+   await listing.save();   
 
-   console.log("New review added");
    res.redirect(`/Listings/${listing._id}`);
-
-})
+}));
 
 // app.get("/testListing", async (req,res)=>{
 //  let sampleTesting = new Listing({
