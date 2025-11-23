@@ -7,6 +7,7 @@ const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync");
 const expressError = require("./utils/expressError");
+const { listingSchema } = require("./schema");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 async function main() {
@@ -52,8 +53,10 @@ app.get("/Listings/new", (req, res) => {
 app.post(
   "/Listings",
   wrapAsync(async (req, res, next) => {
-    if (!req.body.listing) {
-      throw new expressError("Invalid Listing Data", 400);
+    let result = listingSchema.validate(req.body);
+    console.log(result);
+    if (result.error) {
+      throw new expressError(400, result.error);
     }
     const newListing = new Listing(req.body.listing);
     await newListing.save();
@@ -108,7 +111,8 @@ app.delete(
 //error handling middleware
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something went wrong" } = err;
-  res.status(status).send(message);
+  res.render("error.ejs", { message, status });
+  // res.status(status).send(message);
 });
 
 app.listen(8080, () => {
