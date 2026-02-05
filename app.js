@@ -35,13 +35,26 @@ app.get("/", (req, res) => {
   res.send("Hi I am root");
 });
 
+const validateListing = (req, res, next) => {
+  try {
+    let { error } = listingSchema.validate(req.body.listing);
+    if (error) {
+      let errMsg = error.details.map((el) => el.message).join(",");
+      throw new expressError(400, errMsg);
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 //Index Route
 app.get(
   "/Listings",
   wrapAsync(async (req, res) => {
     const allListings = await Listing.find({});
     res.render("listings/index.ejs", { allListings });
-  })
+  }),
 );
 
 //New Route
@@ -52,16 +65,12 @@ app.get("/Listings/new", (req, res) => {
 //Create Route
 app.post(
   "/Listings",
+  validateListing,
   wrapAsync(async (req, res, next) => {
-    let result = listingSchema.validate(req.body);
-    console.log(result);
-    if (result.error) {
-      throw new expressError(400, result.error);
-    }
     const newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/Listings");
-  })
+  }),
 );
 
 //Show Route
@@ -71,7 +80,7 @@ app.get(
     let { id } = req.params;
     const listing = await Listing.findById(id);
     res.render("listings/show.ejs", { listing });
-  })
+  }),
 );
 
 //edit route
@@ -81,17 +90,18 @@ app.get(
     let { id } = req.params;
     const listing = await Listing.findById(id);
     res.render("listings/edit.ejs", { listing });
-  })
+  }),
 );
 
 //update route
 app.put(
   "/Listings/:id",
+  validateListing,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     res.redirect(`/Listings/${id}`);
-  })
+  }),
 );
 
 //Delete Route
@@ -101,7 +111,7 @@ app.delete(
     let { id } = req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/Listings");
-  })
+  }),
 );
 
 // app.all("*", (req, res, next) => {
